@@ -19,7 +19,7 @@ const crearTablaUsuarios = async () => {
   try {
     const client = await pool.connect();
     await client.query(tablaUsuariosQuery);
-    console.log('Tabla usuarios creada o ya existe');
+    console.log('   Tabla usuarios creada o ya existe');
     client.release();
   } catch (err) {
     console.error('Error al crear la tabla usuarios:', err);
