@@ -57,11 +57,11 @@ exports.obtenerPerfilUsuario = async (req, res) => {
 // Actualizar perfil de usuario
 exports.actualizarPerfilUsuario = async (req, res) => {
     const userId = req.user.id;
-    const { nombre, correo, ciudad, direccion, telefono, rol } = req.body;
+    const { nombre, correo, ciudad, direccion, telefono } = req.body;
     try {
         const resultado = await pool.query(
-            'UPDATE usuarios SET nombre = $1, correo = $2, ciudad= $3, direccion = $4, telefono = $5, rol = $6 WHERE id = $7 RETURNING *',
-            [nombre, correo, ciudad, direccion, telefono, rol, userId]
+            'UPDATE usuarios SET nombre = $1, correo = $2, ciudad= $3, direccion = $4, telefono = $5 WHERE id = $6 RETURNING *',
+            [nombre, correo, ciudad, direccion, telefono, userId]
         );
 
         if (resultado.rows.length === 0) {

@@ -30,9 +30,9 @@ const Header = () => {
           </Link>
           {usuario ? (
             <>
-              <div className="flex items-center space-x-2 p-2 rounded-lg bg-purple-500">
+              <div className="flex items-center space-x-2 p-2 rounded-lg bg-purple-500 cursor-pointer">
                 <FontAwesomeIcon icon={faUser} className="text-gray-300" />
-                <span className="text-gray-300">{usuario}</span>
+                <span className="text-gray-300" onClick={() => {navigate("/perfil");}}>{usuario}</span>
               </div>
               <button
                 onClick={handleLogout}

@@ -8,6 +8,7 @@ import Login from "./Login";
 import Registro from "./Registro";
 import Productos from "./Productos";
 import ProductoDetalle from "./ProductoDetalle";
+import Perfil from "./Perfil";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
         <Route path="/registro" element={<Registro />} />
         <Route path="/productos" element={<Productos />} />
         <Route path="/productos/:productoId" element={<ProductoDetalle />} />
+        <Route path="/perfil" element={<Perfil />} />
       </Routes>
       <Footer />
       </AuthProvider>
