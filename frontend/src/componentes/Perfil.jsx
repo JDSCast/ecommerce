@@ -5,27 +5,17 @@ import { AuthContext } from "./AuthContext";
 const Perfil = () => {
   //Estados para la informacion actual del usuario
   const { usuario, token, login } = useContext(AuthContext);
-  const [infoUser, setInfoUser] = useState([]);
+  const [infoUser, setInfoUser] = useState({});
 
   //Estados para editar la informacion del usuario
-  const [editMode, setEditMode] = useState(true);
-  const [nombre, setNombre] = useState("");
-  const [correo, setCorreo] = useState("");
-  const [ciudad, setCiudad] = useState("");
-  const [direccion, setDireccion] = useState("");
-  const [telefono, setTelefono] = useState("");
+  const [editMode, setEditMode] = useState(false);
+
   const [error, setError] = useState("");
 
   // Hooks para obtener la informacion del usuario actual y actualizarla
   useEffect(() => {
     handleUser();
   }, []);
-
-  useEffect(() => {
-    if (infoUser) {
-      fillForm();
-    }
-  }, [infoUser]);
 
   // Funcion para editar la informacion del usuario
   const handleEdit = async (e) => {
@@ -34,16 +24,19 @@ const Perfil = () => {
 
     try {
       if (
-        nombre === "" ||
-        correo === "" ||
-        ciudad === "" ||
-        direccion === "" ||
-        telefono === ""
+        !infoUser.nombre ||
+        !infoUser.correo ||
+        !infoUser.ciudad ||
+        !infoUser.direccion ||
+        !infoUser.telefono
       ) {
         setError("Todos los campos son obligatorios");
         return;
       }
+      //Desestructuración del objeto infoUser
+      const { nombre, correo, ciudad, direccion, telefono } = infoUser;
 
+      //Actualización del usuario
       const response = await apiClient.put(
         `/usuarios/perfil`,
         {
@@ -68,26 +61,29 @@ const Perfil = () => {
   };
   // Funcion para obtener la informacion del usuario actual
   const handleUser = async () => {
-    const response = await apiClient.get("/usuarios/perfil", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    setInfoUser(response.data.usuario);
-  };
-
-  // Funcion para llenar el formulario con la informacion del usaurio
-  const fillForm = () => {
-    setNombre(infoUser.nombre);
-    setCorreo(infoUser.correo);
-    setCiudad(infoUser.ciudad);
-    setDireccion(infoUser.direccion);
-    setTelefono(infoUser.telefono);
+    try {
+      const response = await apiClient.get("/usuarios/perfil", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setInfoUser(response.data.usuario);
+    } catch (error) {
+      setError("Error al cargar los datos del perfil");
+    }
   };
 
   // Función para alternar el estado del input
   const toggleInput = () => {
     setEditMode(!editMode);
+  };
+
+  //Funcion para actualizar el estado de infoUser con respecto a los inputs
+  const handleChange = (e) => {
+    const updatedInfoUser = { ...infoUser }; //copia el infoUser
+    updatedInfoUser[e.target.name] = e.target.value;
+
+    setInfoUser(updatedInfoUser);
   };
 
   return (
@@ -98,45 +94,49 @@ const Perfil = () => {
         <form onSubmit={handleEdit}>
           <input
             type="text"
-            placeholder={infoUser.nombre}
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
+            name="nombre"
+            placeholder="Nombre completo"
+            value={infoUser.nombre || ""}
+            onChange={handleChange}
             className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-70 disabled:font-semibold"
-            disabled={editMode}
+            disabled={!editMode}
           />
           <input
             type="email"
-            placeholder={infoUser.correo}
-            value={correo}
-            onChange={(e) => setCorreo(e.target.value)}
+            name="correo"
+            placeholder="Correo electrónico"
+            value={infoUser.correo || ""}
+            onChange={handleChange}
             className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500  invalid:border-pink-500 invalid:text-pink-600 focus:invalid:border-pink-500 focus:invalid:ring-pink-500 disabled:opacity-70 disabled:font-semibold"
-            disabled={editMode}
+            disabled={!editMode}
           />
           <input
             type="text"
-            placeholder={infoUser.ciudad}
-            value={ciudad}
-            onChange={(e) => setCiudad(e.target.value)}
+            name="ciudad"
+            placeholder="Ciudad"
+            value={infoUser.ciudad || ""}
+            onChange={handleChange}
             className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-70 disabled:font-semibold"
-            disabled={editMode}
+            disabled={!editMode}
           />
           <input
             type="text"
-            placeholder={infoUser.direccion}
-            value={direccion}
-            onChange={(e) => setDireccion(e.target.value)}
+            name="direccion"
+            placeholder="Dirección"
+            value={infoUser.direccion || ""}
+            onChange={handleChange}
             className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-70 disabled:font-semibold"
-            disabled={editMode}
+            disabled={!editMode}
           />
           <input
             type="text"
-            placeholder={infoUser.telefono}
-            value={telefono}
-            onChange={(e) => setTelefono(e.target.value)}
+            name="telefono"
+            placeholder="Teléfono"
+            value={infoUser.telefono || ""}
             className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-70 disabled:font-semibold"
-            disabled={editMode}
+            disabled={!editMode}
           />
-          {editMode ? (
+          {!editMode ? (
             <button
               type="button"
               className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
@@ -149,7 +149,10 @@ const Perfil = () => {
               <button
                 type="button"
                 className="w-5/12 bg-red-400  hover:bg-red-600 text-white py-2 rounded-lg "
-                onClick={()=>{toggleInput(); handleUser();}}
+                onClick={() => {
+                  toggleInput();
+                  handleUser();
+                }}
               >
                 Cancelar
               </button>
