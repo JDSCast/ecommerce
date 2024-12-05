@@ -29,6 +29,60 @@ El objetivo de este proyecto es ofrecer una plataforma en línea donde los clien
 - [MongoDB](https://www.mongodb.com/) - Base de datos NoSQL
 - [PostgreSQL](https://www.postgresql.org/) - Base de datos
 
+## Diagrama entidad-relación de las bases de datos:
+```mermaid
+erDiagram
+
+    USUARIOS ||--|| CARRITOS : "tiene"
+    USUARIOS {
+        SERIAL id PK
+        VARCHAR nombre
+        VARCHAR correo 
+        VARCHAR password
+        VARCHAR ciudad
+        VARCHAR direccion
+        VARCHAR telefono
+        VARCHAR rol
+        TIMESTAMP fecha_registro
+    }
+
+    CARRITOS ||--|{ PRODUCTOS : "contiene"
+    CARRITOS {
+        ObjectId _id PK
+        Number usuarioId FK
+        Array productos
+        Date fechaActualizacion
+    }
+    PRODUCTOS }|--|| CATEGORIAS : "pertenece a"
+    PRODUCTOS {
+        ObjectId _id PK
+        String nombre
+        String descripcion
+        Number precio
+        String imagenUrl
+        Number stock
+        ObjectId categoria FK
+    }
+    
+    CATEGORIAS {
+        ObjectId _id PK
+        String nombre 
+        String descripcion
+        Date fechaCreacion 
+    }
+
+    CARRITOS ||--o| ORDENES : "genera"  
+    ORDENES {
+        ObjectId _id PK
+        Number usuarioId FK
+        ObjectId carritoId FK
+        Array productos
+        Number total
+        String estado
+        Date fechaCreacion
+    }
+```
+
 ## Instalación y Configuración
 
 1. Clona el repositorio:
